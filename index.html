@@ -78,7 +78,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD3MI1klgBSHs1h6QT4VPNoScCfCwMV_Ck",
@@ -101,6 +101,9 @@
                 .then(() => {
                     mensaje.style.color = "green";
                     mensaje.textContent = "✅ Inicio de sesión exitoso";
+                    setTimeout(() => {
+                        window.location.href = "https://as-delta-wheat.vercel.app/"; // Redirige a la web después de iniciar sesión
+                    }, 1000);
                 })
                 .catch((error) => {
                     mensaje.style.color = "red";
@@ -110,6 +113,15 @@
                         mensaje.textContent = "❌ Error al iniciar sesión";
                     }
                 });
+        });
+
+        // Verificar si el usuario está autenticado al entrar a la web
+        onAuthStateChanged(auth, (user) => {
+            if (window.location.href.includes("as-delta-wheat.vercel.app")) {
+                if (!user) {
+                    window.location.href = "URL_DE_TU_PAGINA_DE_LOGIN"; // Redirige al login si no ha iniciado sesión
+                }
+            }
         });
     </script>
 </body>
