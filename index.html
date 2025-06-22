@@ -3,126 +3,609 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión</title>
+    <title>NeonTrade - Comunidad de Trading Futurista</title>
     <style>
+        :root {
+            --neon-blue: #0ff0fc;
+            --neon-purple: #9600ff;
+            --dark-bg: #0a0a1a;
+            --card-bg: rgba(15, 15, 35, 0.8);
+        }
+        
         body {
-            font-family: Arial, sans-serif;
-            background: url('https://raw.githubusercontent.com/welding30001994/IMAGENES-CC/refs/heads/main/fushia-minimalist-wallpaper-free-photo.jpg') no-repeat center center/cover;
+            font-family: 'Arial', sans-serif;
+            background: var(--dark-bg);
+            color: white;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
+            min-height: 100vh;
+            flex-direction: column;
+            padding: 20px;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(150, 0, 255, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0, 255, 252, 0.1) 0%, transparent 20%);
         }
-
-        .container {
-            background: rgba(255, 255, 255, 0.6);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        
+        .header {
             text-align: center;
-            width: 400px;
+            margin-bottom: 30px;
         }
-
-        h2 {
-            margin-bottom: 20px;
-            color: #333;
-            font-size: 24px;
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px rgba(0, 255, 252, 0.3);
         }
-
-        input {
-            width: calc(100% - 24px);
-            padding: 12px;
-            margin: 12px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 18px;
-            background: rgba(255, 255, 255, 0.8);
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
+        
+        .header p {
+            color: #aaa;
+            margin-top: 5px;
         }
-
-        button {
-            background-color: #007bff;
-            color: white;
+        
+        .comment-box, .comment {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 600px;
+            margin: 10px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .comment-box {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .comment-box::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            z-index: -1;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            border-radius: 16px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .comment-box:hover::before {
+            opacity: 0.3;
+        }
+        
+        .comment-box input {
+            width: 70%;
+            padding: 12px 15px;
             border: none;
-            padding: 12px;
-            font-size: 18px;
-            border-radius: 5px;
-            cursor: pointer;
-            width: calc(100% - 24px);
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        .message {
-            margin-top: 15px;
+            border-radius: 25px;
+            outline: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
             font-size: 16px;
         }
+        
+        .comment-box input::placeholder {
+            color: #aaa;
+        }
+        
+        .comment-box button, .reply-button {
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 0 10px rgba(0, 255, 252, 0.3);
+        }
+        
+        .comment-box button:hover, .reply-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(0, 255, 252, 0.5);
+        }
+        
+        .comment p {
+            font-weight: bold;
+            margin: 0 0 10px 0;
+            color: white;
+        }
+        
+        .comment .content {
+            margin-bottom: 15px;
+        }
+        
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            font-size: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 10px;
+        }
+        
+        .actions span {
+            cursor: pointer;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            transition: color 0.2s;
+        }
+        
+        .actions span:hover {
+            color: var(--neon-blue);
+        }
+        
+        .actions span i {
+            margin-right: 5px;
+        }
+        
+        .replies {
+            display: none;
+            margin-left: 30px;
+            padding-left: 15px;
+            border-left: 2px solid var(--neon-purple);
+            max-width: 90%;
+        }
+        
+        .replies .comment {
+            width: 90%;
+            background: rgba(25, 25, 45, 0.8);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 10px 0;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        #commentsSection {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 600px;
+            align-items: center;
+        }
+        
+        .comment img {
+            max-width: 100%;
+            margin-top: 10px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .upload-icon {
+            cursor: pointer;
+            font-size: 20px;
+            margin-left: 10px;
+            color: var(--neon-blue);
+            display: inline-flex;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+        
+        .upload-icon:hover {
+            transform: scale(1.1);
+        }
+        
+        .upload-icon input {
+            display: none;
+        }
+        
+        .preview-container {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .preview-container img {
+            max-width: 50px;
+            max-height: 50px;
+            border-radius: 5px;
+            margin-left: 10px;
+            display: none;
+            border: 1px solid var(--neon-blue);
+        }
+        
+        .signal-tag {
+            display: inline-block;
+            background: rgba(0, 255, 252, 0.2);
+            color: var(--neon-blue);
+            padding: 3px 8px;
+            border-radius: 15px;
+            font-size: 12px;
+            margin-right: 8px;
+            border: 1px solid var(--neon-blue);
+        }
+        
+        .signal-buy {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+            border-color: #00ff00;
+        }
+        
+        .signal-sell {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff0000;
+            border-color: #ff0000;
+        }
+        
+        .signal-info {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 10px;
+            gap: 5px;
+        }
+        
+        .signal-input {
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .signal-input select, .signal-input input {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .timestamp {
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 252, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 255, 252, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 252, 0); }
+        }
+        
+        .live-signal {
+            animation: pulse 2s infinite;
+            position: relative;
+        }
+        
+        .live-signal::after {
+            content: 'LIVE';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: red;
+            color: white;
+            font-size: 10px;
+            padding: 2px 5px;
+            border-radius: 10px;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .toggle-signal {
+            background: none;
+            border: none;
+            color: var(--neon-blue);
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 10px;
+        }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <h2>Iniciar Sesión</h2>
-        <input type="email" id="email" placeholder="Correo">
-        <input type="password" id="password" placeholder="Contraseña">
-        <button id="loginBtn">Iniciar Sesión</button>
-        <p id="mensaje" class="message"></p>
+    <div class="header">
+        <h1>NeonTrade Signals</h1>
+        <p>Comparte y discute señales de trading con la comunidad</p>
+    </div>
+    
+    <div class="comment-box">
+        <input type="text" id="commentInput" placeholder="Escribe tu comentario o señal de trading...">
+        <label class="upload-icon" title="Subir imagen">
+            <i class="fas fa-image"></i>
+            <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)">
+        </label>
+        <button id="postButton" onclick="postComment()"><i class="fas fa-paper-plane"></i> Publicar</button>
+        
+        <div class="preview-container">
+            <img id="imagePreview" class="preview-image">
+        </div>
+        
+        <div class="signal-input" id="signalInput">
+            <select id="signalType">
+                <option value="buy">Compra</option>
+                <option value="sell">Venta</option>
+                <option value="analysis">Análisis</option>
+            </select>
+            <input type="text" id="assetInput" placeholder="Activo (BTC, AAPL...)">
+            <input type="text" id="priceInput" placeholder="Precio">
+            <input type="text" id="targetInput" placeholder="Objetivo">
+            <input type="text" id="stopInput" placeholder="Stop Loss">
+        </div>
+        
+        <button class="toggle-signal" onclick="toggleSignalInput()"><i class="fas fa-chart-line"></i> Añadir señal</button>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    <div id="commentsSection"></div>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyD3MI1klgBSHs1h6QT4VPNoScCfCwMV_Ck",
-            authDomain: "usuario-b0384.firebaseapp.com",
-            projectId: "usuario-b0384",
-            storageBucket: "usuario-b0384.firebasestorage.app",
-            messagingSenderId: "196266170863",
-            appId: "1:196266170863:web:4ea57f489df94aba94fe1a"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-
-        document.getElementById("loginBtn").addEventListener("click", () => {
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value;
-            const mensaje = document.getElementById("mensaje");
-
-            signInWithEmailAndPassword(auth, email, password)
-                .then(() => {
-                    mensaje.style.color = "green";
-                    mensaje.textContent = "✅ Inicio de sesión exitoso";
-                    setTimeout(() => {
-                        window.location.href = "https://as-delta-wheat.vercel.app/"; // Redirige a la web después de iniciar sesión
-                    }, 1000);
-                })
-                .catch((error) => {
-                    mensaje.style.color = "red";
-                    if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
-                        mensaje.textContent = "❌ Usuario no registrado o contraseña incorrecta";
-                    } else {
-                        mensaje.textContent = "❌ Error al iniciar sesión";
-                    }
-                });
+    <script>
+        // Variables globales
+        let selectedImage = null;
+        let showSignalInput = false;
+        
+        // Cargar comentarios al iniciar
+        document.addEventListener('DOMContentLoaded', function() {
+            loadComments();
+            updateSignalInputVisibility();
         });
-
-        // Verificar si el usuario está autenticado al entrar a la web
-        onAuthStateChanged(auth, (user) => {
-            if (window.location.href.includes("as-delta-wheat.vercel.app")) {
-                if (!user) {
-                    window.location.href = "URL_DE_TU_PAGINA_DE_LOGIN"; // Redirige al login si no ha iniciado sesión
+        
+        // Manejar subida de imagen
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                selectedImage = file;
+                showPreview(file);
+            }
+        }
+        
+        // Mostrar vista previa de imagen
+        function showPreview(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById("imagePreview");
+                preview.src = e.target.result;
+                preview.style.display = "block";
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Alternar visibilidad de inputs de señal
+        function toggleSignalInput() {
+            showSignalInput = !showSignalInput;
+            updateSignalInputVisibility();
+        }
+        
+        function updateSignalInputVisibility() {
+            const signalInput = document.getElementById("signalInput");
+            signalInput.style.display = showSignalInput ? "block" : "none";
+            
+            const postButton = document.getElementById("postButton");
+            postButton.innerHTML = showSignalInput 
+                ? '<i class="fas fa-bolt"></i> Publicar señal' 
+                : '<i class="fas fa-paper-plane"></i> Publicar';
+        }
+        
+        // Publicar comentario
+        function postComment() {
+            const input = document.getElementById("commentInput");
+            const commentText = input.value.trim();
+            
+            const signalType = document.getElementById("signalType").value;
+            const asset = document.getElementById("assetInput").value.trim();
+            const price = document.getElementById("priceInput").value.trim();
+            const target = document.getElementById("targetInput").value.trim();
+            const stop = document.getElementById("stopInput").value.trim();
+            
+            const hasSignal = showSignalInput && (asset || price || target || stop);
+            
+            if (commentText !== "" || selectedImage || hasSignal) {
+                const comment = {
+                    id: Date.now(),
+                    text: commentText,
+                    image: selectedImage ? true : false,
+                    timestamp: new Date().toISOString(),
+                    likes: 0,
+                    replies: [],
+                    signal: hasSignal ? {
+                        type: signalType,
+                        asset: asset,
+                        price: price,
+                        target: target,
+                        stop: stop,
+                        isLive: true
+                    } : null
+                };
+                
+                // Guardar la imagen en localStorage si existe
+                if (selectedImage) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        localStorage.setItem(`commentImg_${comment.id}`, e.target.result);
+                        saveComment(comment);
+                    };
+                    reader.readAsDataURL(selectedImage);
+                } else {
+                    saveComment(comment);
+                }
+                
+                // Limpiar inputs
+                input.value = "";
+                document.getElementById("imageInput").value = "";
+                document.getElementById("imagePreview").style.display = "none";
+                selectedImage = null;
+                
+                if (showSignalInput) {
+                    document.getElementById("assetInput").value = "";
+                    document.getElementById("priceInput").value = "";
+                    document.getElementById("targetInput").value = "";
+                    document.getElementById("stopInput").value = "";
+                    showSignalInput = false;
+                    updateSignalInputVisibility();
                 }
             }
-        });
+        }
+        
+        // Guardar comentario en localStorage
+        function saveComment(comment) {
+            let comments = JSON.parse(localStorage.getItem('comments')) || [];
+            comments.unshift(comment); // Añadir al inicio
+            localStorage.setItem('comments', JSON.stringify(comments));
+            renderComment(comment);
+        }
+        
+        // Cargar comentarios desde localStorage
+        function loadComments() {
+            const comments = JSON.parse(localStorage.getItem('comments')) || [];
+            comments.forEach(comment => {
+                renderComment(comment);
+            });
+        }
+        
+        // Renderizar comentario en el DOM
+        function renderComment(comment) {
+            const commentContainer = document.createElement("div");
+            commentContainer.classList.add("comment");
+            if (comment.signal?.isLive) {
+                commentContainer.classList.add("live-signal");
+            }
+            
+            const timestamp = new Date(comment.timestamp).toLocaleString();
+            
+            let signalHTML = '';
+            if (comment.signal) {
+                const signalTypeClass = comment.signal.type === 'buy' ? 'signal-buy' : 
+                                       comment.signal.type === 'sell' ? 'signal-sell' : '';
+                
+                signalHTML = `
+                    <div class="signal-info">
+                        ${comment.signal.asset ? `<span class="signal-tag ${signalTypeClass}"><i class="fas fa-${comment.signal.type === 'buy' ? 'arrow-up' : 'arrow-down'}"></i> ${comment.signal.asset}</span>` : ''}
+                        ${comment.signal.price ? `<span class="signal-tag"><i class="fas fa-tag"></i> ${comment.signal.price}</span>` : ''}
+                        ${comment.signal.target ? `<span class="signal-tag"><i class="fas fa-bullseye"></i> ${comment.signal.target}</span>` : ''}
+                        ${comment.signal.stop ? `<span class="signal-tag"><i class="fas fa-shield-alt"></i> ${comment.signal.stop}</span>` : ''}
+                    </div>
+                `;
+            }
+            
+            commentContainer.innerHTML = `
+                <div class="content">
+                    <p>${comment.text || (comment.signal ? 'Señal de trading' : 'Publicación')}</p>
+                    ${signalHTML}
+                    <div class="timestamp">${timestamp}</div>
+                    ${comment.image ? `<img src="${localStorage.getItem(`commentImg_${comment.id}`)}" alt="Imagen adjunta">` : ''}
+                </div>
+                <div class="actions">
+                    <span onclick="likeComment(this, ${comment.id})"><i class="fas fa-thumbs-up"></i> Me gusta (<span class="like-count">${comment.likes}</span>)</span>
+                    <span onclick="toggleReplies(this, ${comment.id})"><i class="fas fa-comment"></i> Comentar</span>
+                    <span onclick="shareComment(${comment.id})"><i class="fas fa-share"></i> Compartir</span>
+                </div>
+                <div class="replies" id="replies-${comment.id}"></div>
+            `;
+            
+            document.getElementById("commentsSection").prepend(commentContainer);
+            
+            // Cargar respuestas si existen
+            if (comment.replies && comment.replies.length > 0) {
+                const repliesDiv = document.getElementById(`replies-${comment.id}`);
+                comment.replies.forEach(reply => {
+                    renderReply(reply, repliesDiv);
+                });
+            }
+        }
+        
+        // Dar like a un comentario
+        function likeComment(element, commentId) {
+            let comments = JSON.parse(localStorage.getItem('comments'));
+            const commentIndex = comments.findIndex(c => c.id === commentId);
+            
+            if (commentIndex !== -1) {
+                comments[commentIndex].likes += 1;
+                localStorage.setItem('comments', JSON.stringify(comments));
+                
+                const likeCount = element.querySelector('.like-count');
+                likeCount.textContent = comments[commentIndex].likes;
+            }
+        }
+        
+        // Alternar visibilidad de respuestas
+        function toggleReplies(element, commentId) {
+            const commentElement = element.closest('.comment');
+            const repliesDiv = commentElement.querySelector('.replies');
+            
+            if (repliesDiv.style.display === "none" || repliesDiv.style.display === "") {
+                repliesDiv.style.display = "block";
+                addReplyBox(repliesDiv, commentId);
+            } else {
+                repliesDiv.style.display = "none";
+            }
+        }
+        
+        // Añadir caja de respuesta
+        function addReplyBox(repliesDiv, commentId) {
+            if (!repliesDiv.querySelector('.reply-box')) {
+                const replyBox = document.createElement('div');
+                replyBox.className = 'reply-box';
+                replyBox.innerHTML = `
+                    <input type="text" class="reply-input" placeholder="Escribe una respuesta...">
+                    <button class="reply-button" onclick="postReply(this, ${commentId})"><i class="fas fa-reply"></i></button>
+                `;
+                repliesDiv.appendChild(replyBox);
+            }
+        }
+        
+        // Publicar respuesta
+        function postReply(button, commentId) {
+            const replyInput = button.previousElementSibling;
+            const replyText = replyInput.value.trim();
+            
+            if (replyText !== "") {
+                const reply = {
+                    id: Date.now(),
+                    text: replyText,
+                    timestamp: new Date().toISOString()
+                };
+                
+                // Actualizar localStorage
+                let comments = JSON.parse(localStorage.getItem('comments'));
+                const commentIndex = comments.findIndex(c => c.id === commentId);
+                
+                if (commentIndex !== -1) {
+                    if (!comments[commentIndex].replies) {
+                        comments[commentIndex].replies = [];
+                    }
+                    
+                    comments[commentIndex].replies.push(reply);
+                    localStorage.setItem('comments', JSON.stringify(comments));
+                    
+                    // Renderizar la respuesta
+                    const repliesDiv = button.closest('.replies');
+                    renderReply(reply, repliesDiv);
+                    
+                    // Limpiar input
+                    replyInput.value = "";
+                }
+            }
+        }
+        
+        // Renderizar respuesta
+        function renderReply(reply, repliesDiv) {
+            const timestamp = new Date(reply.timestamp).toLocaleString();
+            
+            const replyElement = document.createElement('div');
+            replyElement.className = 'comment reply';
+            replyElement.innerHTML = `
+                <div class="content">
+                    <p>${reply.text}</p>
+                    <div class="timestamp">${timestamp}</div>
+                </div>
+            `;
+            
+            repliesDiv.appendChild(replyElement);
+        }
+        
+        // Compartir comentario
+        function shareComment(commentId) {
+            // En una implementación real, esto podría usar la Web Share API o enlaces a redes sociales
+            alert(`Compartiendo comentario ${commentId}. En una aplicación real, esto abriría opciones de compartir.`);
+        }
     </script>
 </body>
 </html>
