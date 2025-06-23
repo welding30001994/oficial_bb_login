@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NeonTrade - Comunidad de Trading Futurista</title>
+    <title>OXOMAX-TRADING</title>
     <style>
         :root {
             --neon-blue: #0ff0fc;
@@ -304,8 +304,8 @@
 </head>
 <body>
     <div class="header">
-        <h1>NeonTrade Signals</h1>
-        <p>Comparte y discute señales de trading con la comunidad</p>
+        <h1>OXOMAX-TRADING</h1>
+        <p>Señales de trading con la comunidad</p>
     </div>
     
     <div class="comment-box">
@@ -401,7 +401,7 @@
                 const comment = {
                     id: Date.now(),
                     text: commentText,
-                    image: selectedImage ? true : false,
+                    hasImage: selectedImage ? true : false,
                     timestamp: new Date().toISOString(),
                     likes: 0,
                     replies: [],
@@ -485,30 +485,46 @@
                 `;
             }
             
+            let imageHTML = '';
+            if (comment.hasImage) {
+                const imageData = localStorage.getItem(`commentImg_${comment.id}`);
+                if (imageData) {
+                    imageHTML = `<img src="${imageData}" alt="Imagen adjunta">`;
+                }
+            }
+            
             commentContainer.innerHTML = `
                 <div class="content">
                     <p>${comment.text || (comment.signal ? 'Señal de trading' : 'Publicación')}</p>
                     ${signalHTML}
                     <div class="timestamp">${timestamp}</div>
-                    ${comment.image ? `<img src="${localStorage.getItem(`commentImg_${comment.id}`)}" alt="Imagen adjunta">` : ''}
+                    ${imageHTML}
                 </div>
                 <div class="actions">
                     <span onclick="likeComment(this, ${comment.id})"><i class="fas fa-thumbs-up"></i> Me gusta (<span class="like-count">${comment.likes}</span>)</span>
                     <span onclick="toggleReplies(this, ${comment.id})"><i class="fas fa-comment"></i> Comentar</span>
                     <span onclick="shareComment(${comment.id})"><i class="fas fa-share"></i> Compartir</span>
                 </div>
-                <div class="replies" id="replies-${comment.id}"></div>
+                <div class="replies" id="replies-${comment.id}">
+                    ${comment.replies && comment.replies.length > 0 ? 
+                       comment.replies.map(reply => renderReplyHTML(reply)).join('') : ''}
+                </div>
             `;
             
             document.getElementById("commentsSection").prepend(commentContainer);
-            
-            // Cargar respuestas si existen
-            if (comment.replies && comment.replies.length > 0) {
-                const repliesDiv = document.getElementById(`replies-${comment.id}`);
-                comment.replies.forEach(reply => {
-                    renderReply(reply, repliesDiv);
-                });
-            }
+        }
+        
+        // Función para generar HTML de respuestas
+        function renderReplyHTML(reply) {
+            const timestamp = new Date(reply.timestamp).toLocaleString();
+            return `
+                <div class="comment reply">
+                    <div class="content">
+                        <p>${reply.text}</p>
+                        <div class="timestamp">${timestamp}</div>
+                    </div>
+                </div>
+            `;
         }
         
         // Dar like a un comentario
@@ -521,7 +537,9 @@
                 localStorage.setItem('comments', JSON.stringify(comments));
                 
                 const likeCount = element.querySelector('.like-count');
-                likeCount.textContent = comments[commentIndex].likes;
+                if (likeCount) {
+                    likeCount.textContent = comments[commentIndex].likes;
+                }
             }
         }
         
@@ -577,28 +595,15 @@
                     
                     // Renderizar la respuesta
                     const repliesDiv = button.closest('.replies');
-                    renderReply(reply, repliesDiv);
+                    const replyElement = document.createElement('div');
+                    replyElement.className = 'comment reply';
+                    replyElement.innerHTML = renderReplyHTML(reply);
+                    repliesDiv.appendChild(replyElement);
                     
                     // Limpiar input
                     replyInput.value = "";
                 }
             }
-        }
-        
-        // Renderizar respuesta
-        function renderReply(reply, repliesDiv) {
-            const timestamp = new Date(reply.timestamp).toLocaleString();
-            
-            const replyElement = document.createElement('div');
-            replyElement.className = 'comment reply';
-            replyElement.innerHTML = `
-                <div class="content">
-                    <p>${reply.text}</p>
-                    <div class="timestamp">${timestamp}</div>
-                </div>
-            `;
-            
-            repliesDiv.appendChild(replyElement);
         }
         
         // Compartir comentario
