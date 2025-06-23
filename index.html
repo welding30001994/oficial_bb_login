@@ -299,55 +299,237 @@
             font-size: 12px;
             margin-left: 10px;
         }
+        
+        /* Login styles */
+        .login-container {
+            display: none;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 400px;
+            margin: 20px auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        
+        .login-container h2 {
+            margin-top: 0;
+            color: var(--neon-blue);
+        }
+        
+        .login-container input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .login-container button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .login-message {
+            margin-top: 15px;
+            color: #ff5555;
+        }
+        
+        .user-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .delete-btn {
+            background: #ff5555 !important;
+            margin-left: 10px;
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <div class="header">
-        <h1>OXOMAX-TRADING</h1>
-        <p>Señales de trading con la comunidad</p>
-    </div>
-    
-    <div class="comment-box">
-        <input type="text" id="commentInput" placeholder="Escribe tu comentario o señal de trading...">
-        <label class="upload-icon" title="Subir imagen">
-            <i class="fas fa-image"></i>
-            <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)">
-        </label>
-        <button id="postButton" onclick="postComment()"><i class="fas fa-paper-plane"></i> Publicar</button>
-        
-        <div class="preview-container">
-            <img id="imagePreview" class="preview-image">
-        </div>
-        
-        <div class="signal-input" id="signalInput">
-            <select id="signalType">
-                <option value="buy">Compra</option>
-                <option value="sell">Venta</option>
-                <option value="analysis">Análisis</option>
-            </select>
-            <input type="text" id="assetInput" placeholder="Activo (BTC, AAPL...)">
-            <input type="text" id="priceInput" placeholder="Precio">
-            <input type="text" id="targetInput" placeholder="Objetivo">
-            <input type="text" id="stopInput" placeholder="Stop Loss">
-        </div>
-        
-        <button class="toggle-signal" onclick="toggleSignalInput()"><i class="fas fa-chart-line"></i> Añadir señal</button>
+    <div class="login-container" id="loginContainer">
+        <h2>Iniciar sesión</h2>
+        <input type="email" id="loginEmail" placeholder="Correo electrónico">
+        <input type="password" id="loginPassword" placeholder="Contraseña">
+        <button onclick="login()">Iniciar sesión</button>
+        <button onclick="signUp()">Registrarse</button>
+        <div class="login-message" id="loginMessage"></div>
     </div>
 
-    <div id="commentsSection"></div>
+    <div id="appContent" style="display: none;">
+        <div class="user-info" id="userInfo">
+            <img id="userPhoto" src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png">
+            <span id="userName">Usuario</span>
+            <button onclick="logout()" style="margin-left: 10px;">Cerrar sesión</button>
+        </div>
+        
+        <div class="header">
+            <h1>OXOMAX-TRADING</h1>
+            <p>Señales de trading con la comunidad</p>
+        </div>
+        
+        <div class="comment-box">
+            <input type="text" id="commentInput" placeholder="Escribe tu comentario o señal de trading...">
+            <label class="upload-icon" title="Subir imagen">
+                <i class="fas fa-image"></i>
+                <input type="file" id="imageInput" accept="image/*">
+            </label>
+            <button id="postButton" onclick="postComment()"><i class="fas fa-paper-plane"></i> Publicar</button>
+            
+            <div class="preview-container">
+                <img id="imagePreview" class="preview-image">
+            </div>
+            
+            <div class="signal-input" id="signalInput">
+                <select id="signalType">
+                    <option value="buy">Compra</option>
+                    <option value="sell">Venta</option>
+                    <option value="analysis">Análisis</option>
+                </select>
+                <input type="text" id="assetInput" placeholder="Activo (BTC, AAPL...)">
+                <input type="text" id="priceInput" placeholder="Precio">
+                <input type="text" id="targetInput" placeholder="Objetivo">
+                <input type="text" id="stopInput" placeholder="Stop Loss">
+            </div>
+            
+            <button class="toggle-signal" onclick="toggleSignalInput()"><i class="fas fa-chart-line"></i> Añadir señal</button>
+        </div>
+
+        <div id="commentsSection"></div>
+    </div>
+
+    <!-- Import Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
 
     <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD3MI1klgBSHs1h6QT4VPNoScCfCwMV_Ck",
+            authDomain: "usuario-b0384.firebaseapp.com",
+            databaseURL: "https://usuario-b0384-default-rtdb.firebaseio.com",
+            projectId: "usuario-b0384",
+            storageBucket: "usuario-b0384.appspot.com",
+            messagingSenderId: "196266170863",
+            appId: "1:196266170863:web:4ea57f489df94aba94fe1a"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+        const storage = firebase.storage();
+
         // Variables globales
         let selectedImage = null;
         let showSignalInput = false;
-        
-        // Cargar comentarios al iniciar
+        let currentUser = null;
+
+        // Cargar cuando el DOM esté listo
         document.addEventListener('DOMContentLoaded', function() {
-            loadComments();
-            updateSignalInputVisibility();
+            // Escuchar cambios en la autenticación
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    // Usuario logueado
+                    currentUser = user;
+                    showAppContent();
+                    loadComments();
+                    updateUserInfo();
+                } else {
+                    // No hay usuario logueado
+                    showLoginForm();
+                }
+            });
+            
+            // Configurar evento de subida de imagen
+            document.getElementById('imageInput').addEventListener('change', handleImageUpload);
         });
-        
+
+        // Mostrar formulario de login
+        function showLoginForm() {
+            document.getElementById('loginContainer').style.display = 'block';
+            document.getElementById('appContent').style.display = 'none';
+        }
+
+        // Mostrar contenido de la app
+        function showAppContent() {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('appContent').style.display = 'block';
+        }
+
+        // Actualizar información del usuario
+        function updateUserInfo() {
+            if (currentUser) {
+                document.getElementById('userName').textContent = currentUser.displayName || currentUser.email;
+                if (currentUser.photoURL) {
+                    document.getElementById('userPhoto').src = currentUser.photoURL;
+                }
+            }
+        }
+
+        // Iniciar sesión
+        function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const message = document.getElementById('loginMessage');
+            
+            message.textContent = '';
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .catch(error => {
+                    message.textContent = error.message;
+                });
+        }
+
+        // Registrarse
+        function signUp() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const message = document.getElementById('loginMessage');
+            
+            message.textContent = '';
+            
+            auth.createUserWithEmailAndPassword(email, password)
+                .then(() => {
+                    // Actualizar nombre del usuario con el email (sin el dominio)
+                    const displayName = email.split('@')[0];
+                    return currentUser.updateProfile({
+                        displayName: displayName
+                    });
+                })
+                .catch(error => {
+                    message.textContent = error.message;
+                });
+        }
+
+        // Cerrar sesión
+        function logout() {
+            auth.signOut();
+        }
+
         // Manejar subida de imagen
         function handleImageUpload(event) {
             const file = event.target.files[0];
@@ -356,7 +538,7 @@
                 showPreview(file);
             }
         }
-        
+
         // Mostrar vista previa de imagen
         function showPreview(file) {
             const reader = new FileReader();
@@ -367,13 +549,13 @@
             };
             reader.readAsDataURL(file);
         }
-        
+
         // Alternar visibilidad de inputs de señal
         function toggleSignalInput() {
             showSignalInput = !showSignalInput;
             updateSignalInputVisibility();
         }
-        
+
         function updateSignalInputVisibility() {
             const signalInput = document.getElementById("signalInput");
             signalInput.style.display = showSignalInput ? "block" : "none";
@@ -383,9 +565,11 @@
                 ? '<i class="fas fa-bolt"></i> Publicar señal' 
                 : '<i class="fas fa-paper-plane"></i> Publicar';
         }
-        
+
         // Publicar comentario
         function postComment() {
+            if (!currentUser) return;
+            
             const input = document.getElementById("commentInput");
             const commentText = input.value.trim();
             
@@ -399,12 +583,15 @@
             
             if (commentText !== "" || selectedImage || hasSignal) {
                 const comment = {
-                    id: Date.now(),
+                    userId: currentUser.uid,
+                    userEmail: currentUser.email,
+                    userName: currentUser.displayName || currentUser.email.split('@')[0],
+                    userPhoto: currentUser.photoURL || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png',
                     text: commentText,
                     hasImage: selectedImage ? true : false,
-                    timestamp: new Date().toISOString(),
+                    timestamp: firebase.database.ServerValue.TIMESTAMP,
                     likes: 0,
-                    replies: [],
+                    replies: {},
                     signal: hasSignal ? {
                         type: signalType,
                         asset: asset,
@@ -415,16 +602,20 @@
                     } : null
                 };
                 
-                // Guardar la imagen en localStorage si existe
+                // Subir imagen si existe
                 if (selectedImage) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        localStorage.setItem(`commentImg_${comment.id}`, e.target.result);
-                        saveComment(comment);
-                    };
-                    reader.readAsDataURL(selectedImage);
+                    const storageRef = storage.ref(`comments/${currentUser.uid}/${Date.now()}`);
+                    storageRef.put(selectedImage).then(snapshot => {
+                        return snapshot.ref.getDownloadURL();
+                    }).then(imageUrl => {
+                        comment.imageUrl = imageUrl;
+                        saveCommentToDatabase(comment);
+                    }).catch(error => {
+                        console.error("Error uploading image:", error);
+                        saveCommentToDatabase(comment);
+                    });
                 } else {
-                    saveComment(comment);
+                    saveCommentToDatabase(comment);
                 }
                 
                 // Limpiar inputs
@@ -443,23 +634,35 @@
                 }
             }
         }
-        
-        // Guardar comentario en localStorage
-        function saveComment(comment) {
-            let comments = JSON.parse(localStorage.getItem('comments')) || [];
-            comments.unshift(comment); // Añadir al inicio
-            localStorage.setItem('comments', JSON.stringify(comments));
-            renderComment(comment);
+
+        // Guardar comentario en Firebase
+        function saveCommentToDatabase(comment) {
+            const newCommentRef = database.ref('comments').push();
+            newCommentRef.set(comment)
+                .catch(error => {
+                    console.error("Error saving comment:", error);
+                });
         }
-        
-        // Cargar comentarios desde localStorage
+
+        // Cargar comentarios desde Firebase
         function loadComments() {
-            const comments = JSON.parse(localStorage.getItem('comments')) || [];
-            comments.forEach(comment => {
-                renderComment(comment);
+            database.ref('comments').orderByChild('timestamp').on('value', snapshot => {
+                const commentsSection = document.getElementById("commentsSection");
+                commentsSection.innerHTML = '';
+                
+                const comments = [];
+                snapshot.forEach(childSnapshot => {
+                    const comment = childSnapshot.val();
+                    comment.id = childSnapshot.key;
+                    comments.unshift(comment); // Orden inverso (más nuevos primero)
+                });
+                
+                comments.forEach(comment => {
+                    renderComment(comment);
+                });
             });
         }
-        
+
         // Renderizar comentario en el DOM
         function renderComment(comment) {
             const commentContainer = document.createElement("div");
@@ -486,63 +689,78 @@
             }
             
             let imageHTML = '';
-            if (comment.hasImage) {
-                const imageData = localStorage.getItem(`commentImg_${comment.id}`);
-                if (imageData) {
-                    imageHTML = `<img src="${imageData}" alt="Imagen adjunta">`;
-                }
+            if (comment.imageUrl) {
+                imageHTML = `<img src="${comment.imageUrl}" alt="Imagen adjunta">`;
+            }
+            
+            // Botón de eliminar solo para el autor
+            let deleteButton = '';
+            if (currentUser && comment.userId === currentUser.uid) {
+                deleteButton = `<button class="delete-btn" onclick="deleteComment('${comment.id}')"><i class="fas fa-trash"></i> Eliminar</button>`;
             }
             
             commentContainer.innerHTML = `
                 <div class="content">
+                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <img src="${comment.userPhoto}" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px;">
+                        <span style="font-weight: bold;">${comment.userName}</span>
+                    </div>
                     <p>${comment.text || (comment.signal ? 'Señal de trading' : 'Publicación')}</p>
                     ${signalHTML}
                     <div class="timestamp">${timestamp}</div>
                     ${imageHTML}
                 </div>
                 <div class="actions">
-                    <span onclick="likeComment(this, ${comment.id})"><i class="fas fa-thumbs-up"></i> Me gusta (<span class="like-count">${comment.likes}</span>)</span>
-                    <span onclick="toggleReplies(this, ${comment.id})"><i class="fas fa-comment"></i> Comentar</span>
-                    <span onclick="shareComment(${comment.id})"><i class="fas fa-share"></i> Compartir</span>
+                    <span onclick="likeComment('${comment.id}', ${comment.likes || 0})"><i class="fas fa-thumbs-up"></i> Me gusta (<span class="like-count">${comment.likes || 0}</span>)</span>
+                    <span onclick="toggleReplies(this, '${comment.id}')"><i class="fas fa-comment"></i> Comentar</span>
+                    <span onclick="shareComment('${comment.id}')"><i class="fas fa-share"></i> Compartir</span>
+                    ${deleteButton}
                 </div>
                 <div class="replies" id="replies-${comment.id}">
-                    ${comment.replies && comment.replies.length > 0 ? 
-                       comment.replies.map(reply => renderReplyHTML(reply)).join('') : ''}
+                    ${comment.replies ? renderReplies(comment.replies, comment.id) : ''}
                 </div>
             `;
             
-            document.getElementById("commentsSection").prepend(commentContainer);
+            document.getElementById("commentsSection").appendChild(commentContainer);
         }
-        
-        // Función para generar HTML de respuestas
-        function renderReplyHTML(reply) {
-            const timestamp = new Date(reply.timestamp).toLocaleString();
-            return `
-                <div class="comment reply">
-                    <div class="content">
-                        <p>${reply.text}</p>
-                        <div class="timestamp">${timestamp}</div>
-                    </div>
-                </div>
-            `;
-        }
-        
-        // Dar like a un comentario
-        function likeComment(element, commentId) {
-            let comments = JSON.parse(localStorage.getItem('comments'));
-            const commentIndex = comments.findIndex(c => c.id === commentId);
-            
-            if (commentIndex !== -1) {
-                comments[commentIndex].likes += 1;
-                localStorage.setItem('comments', JSON.stringify(comments));
+
+        // Renderizar respuestas
+        function renderReplies(replies, commentId) {
+            let repliesHTML = '';
+            for (const replyId in replies) {
+                const reply = replies[replyId];
+                const timestamp = new Date(reply.timestamp).toLocaleString();
                 
-                const likeCount = element.querySelector('.like-count');
-                if (likeCount) {
-                    likeCount.textContent = comments[commentIndex].likes;
+                let deleteButton = '';
+                if (currentUser && reply.userId === currentUser.uid) {
+                    deleteButton = `<button class="delete-btn" style="margin-left: 10px; font-size: 12px; padding: 5px 10px;" onclick="deleteReply('${commentId}', '${replyId}')"><i class="fas fa-trash"></i></button>`;
                 }
+                
+                repliesHTML += `
+                    <div class="comment reply" id="reply-${commentId}-${replyId}">
+                        <div class="content">
+                            <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                                <img src="${reply.userPhoto}" style="width: 25px; height: 25px; border-radius: 50%; margin-right: 8px;">
+                                <span style="font-size: 14px; font-weight: bold;">${reply.userName}</span>
+                            </div>
+                            <p style="margin: 5px 0; font-size: 14px;">${reply.text}</p>
+                            <div class="timestamp" style="font-size: 11px;">${timestamp}</div>
+                            ${deleteButton}
+                        </div>
+                    </div>
+                `;
             }
+            return repliesHTML;
         }
-        
+
+        // Dar like a un comentario
+        function likeComment(commentId, currentLikes) {
+            if (!currentUser) return;
+            
+            const newLikes = (currentLikes || 0) + 1;
+            database.ref(`comments/${commentId}/likes`).set(newLikes);
+        }
+
         // Alternar visibilidad de respuestas
         function toggleReplies(element, commentId) {
             const commentElement = element.closest('.comment');
@@ -555,7 +773,7 @@
                 repliesDiv.style.display = "none";
             }
         }
-        
+
         // Añadir caja de respuesta
         function addReplyBox(repliesDiv, commentId) {
             if (!repliesDiv.querySelector('.reply-box')) {
@@ -563,49 +781,71 @@
                 replyBox.className = 'reply-box';
                 replyBox.innerHTML = `
                     <input type="text" class="reply-input" placeholder="Escribe una respuesta...">
-                    <button class="reply-button" onclick="postReply(this, ${commentId})"><i class="fas fa-reply"></i></button>
+                    <button class="reply-button" onclick="postReply(this, '${commentId}')"><i class="fas fa-reply"></i></button>
                 `;
                 repliesDiv.appendChild(replyBox);
             }
         }
-        
+
         // Publicar respuesta
         function postReply(button, commentId) {
+            if (!currentUser) return;
+            
             const replyInput = button.previousElementSibling;
             const replyText = replyInput.value.trim();
             
             if (replyText !== "") {
                 const reply = {
-                    id: Date.now(),
+                    userId: currentUser.uid,
+                    userEmail: currentUser.email,
+                    userName: currentUser.displayName || currentUser.email.split('@')[0],
+                    userPhoto: currentUser.photoURL || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png',
                     text: replyText,
-                    timestamp: new Date().toISOString()
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
                 };
                 
-                // Actualizar localStorage
-                let comments = JSON.parse(localStorage.getItem('comments'));
-                const commentIndex = comments.findIndex(c => c.id === commentId);
-                
-                if (commentIndex !== -1) {
-                    if (!comments[commentIndex].replies) {
-                        comments[commentIndex].replies = [];
-                    }
-                    
-                    comments[commentIndex].replies.push(reply);
-                    localStorage.setItem('comments', JSON.stringify(comments));
-                    
-                    // Renderizar la respuesta
-                    const repliesDiv = button.closest('.replies');
-                    const replyElement = document.createElement('div');
-                    replyElement.className = 'comment reply';
-                    replyElement.innerHTML = renderReplyHTML(reply);
-                    repliesDiv.appendChild(replyElement);
-                    
-                    // Limpiar input
-                    replyInput.value = "";
-                }
+                // Guardar respuesta en Firebase
+                const newReplyRef = database.ref(`comments/${commentId}/replies`).push();
+                newReplyRef.set(reply)
+                    .then(() => {
+                        replyInput.value = "";
+                    })
+                    .catch(error => {
+                        console.error("Error posting reply:", error);
+                    });
             }
         }
-        
+
+        // Eliminar comentario
+        function deleteComment(commentId) {
+            if (!currentUser) return;
+            
+            if (confirm("¿Estás seguro de que quieres eliminar este comentario?")) {
+                // Eliminar imagen si existe
+                database.ref(`comments/${commentId}`).once('value').then(snapshot => {
+                    const comment = snapshot.val();
+                    if (comment.imageUrl) {
+                        const imageRef = storage.refFromURL(comment.imageUrl);
+                        imageRef.delete().catch(error => {
+                            console.error("Error deleting image:", error);
+                        });
+                    }
+                    
+                    // Eliminar comentario de la base de datos
+                    database.ref(`comments/${commentId}`).remove();
+                });
+            }
+        }
+
+        // Eliminar respuesta
+        function deleteReply(commentId, replyId) {
+            if (!currentUser) return;
+            
+            if (confirm("¿Estás seguro de que quieres eliminar esta respuesta?")) {
+                database.ref(`comments/${commentId}/replies/${replyId}`).remove();
+            }
+        }
+
         // Compartir comentario
         function shareComment(commentId) {
             // En una implementación real, esto podría usar la Web Share API o enlaces a redes sociales
